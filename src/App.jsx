@@ -12,6 +12,8 @@ import AuthCallback from './pages/AuthCallback'
 import Profile from './pages/Profile'
 import ResetPassword from './pages/ResetPassword'
 import VerifyEmail from './pages/VerifyEmail'
+import RequestDetail from './pages/RequestDetail'
+
 
 export default function App() {
   return (
@@ -31,7 +33,15 @@ export default function App() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/worker" element={<ProtectedRoute requiredRole="worker"><WorkerPanel /></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPanel /></ProtectedRoute>} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole={['admin', 'superadmin']}>
+                <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/request/:id" element={<RequestDetail />} />
           <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />

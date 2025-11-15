@@ -1,27 +1,31 @@
-import axios from 'axios'
+import { profileAPI } from './base'
 
-const API_URL = import.meta.env.VITE_AUTH_URL
-
-export async function getUserList(params = {}) {
-  return axios.get(`${API_URL}/admin/users`, { params })
+// Получить список пользователей (админ)
+export const getUserList = (filters = { page: 1, limit: 10, role: '', search: '' }) => {
+  return profileAPI.get('/admin/users', filters)
 }
 
-export async function banUser(userId) {
-  return axios.put(`${API_URL}/admin/ban`, { user_id: userId })
+// Забанить пользователя
+export const banUser = (userId) => {
+  return profileAPI.put('/admin/ban', { user_id: userId })
 }
 
-export async function unbanUser(userId) {
-  return axios.put(`${API_URL}/admin/unban`, { user_id: userId })
+// Разбанить пользователя
+export const unbanUser = (userId) => {
+  return profileAPI.put('/admin/unban', { user_id: userId })
 }
 
-export async function assignWorker(userId) {
-  return axios.put(`${API_URL}/admin/assign-worker`, { user_id: userId })
+// Назначить роль worker
+export const assignWorker = (userId) => {
+  return profileAPI.put('/admin/assign-worker', { user_id: userId })
 }
 
-export async function deleteWorker(userId) {
-  return axios.delete(`${API_URL}/admin/worker`, { data: { user_id: userId } })
+// Удалить роль worker
+export const deleteWorker = (userId) => {
+  return profileAPI.delete('/admin/worker', { data: { user_id: userId } })
 }
 
-export async function createSkill(name) {
-  return axios.post(`${API_URL}/admin/skills`, { name })
+// Создать новый навык
+export const createSkill = (name) => {
+  return profileAPI.post('/admin/skills', { name })
 }
