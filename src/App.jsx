@@ -13,6 +13,7 @@ import Profile from './pages/Profile'
 import ResetPassword from './pages/ResetPassword'
 import VerifyEmail from './pages/VerifyEmail'
 import RequestDetail from './pages/RequestDetail'
+import AccessDenied from './pages/AccessDenied'; 
 
 
 export default function App() {
@@ -31,8 +32,10 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />  
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/access-denied" element={<AccessDenied />} />
+
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/worker" element={<ProtectedRoute requiredRole="worker"><WorkerPanel /></ProtectedRoute>} />
+          <Route path="/worker-panel" element={<ProtectedRoute requiredRole="contractor"><WorkerPanel /></ProtectedRoute>} />
           <Route
             path="/admin"
             element={

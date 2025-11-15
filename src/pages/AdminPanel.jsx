@@ -20,22 +20,23 @@ export default function AdminPanel() {
   const [skillName, setSkillName] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // Загрузка пользователей
-  const loadUsers = async (filters = {}) => {
+  // Загружаем список пользователей
+  const loadUsers = async () => {
     setLoading(true)
     try {
       const res = await getUserList({
         page,
         limit,
-        role,
-        search,
-        ...filters
+        role: role || '',
+        search: search || ''
       })
+
       if (!res.data || !Array.isArray(res.data.users)) {
         toast.error('Не удалось загрузить список пользователей')
         setUsers([])
         return
       }
+
       setUsers(res.data.users)
     } catch (err) {
       toast.error(`Ошибка загрузки пользователей: ${err.message}`)
@@ -45,21 +46,22 @@ export default function AdminPanel() {
     }
   }
 
+  // Загружаем при изменении page, role, search
   useEffect(() => {
     loadUsers()
   }, [page, role, search])
 
+  // Поиск
   const handleSearch = (e) => {
     e.preventDefault()
     setPage(1)
-    loadUsers({ search })
   }
 
-  // Действия с пользователями: бан, разбан, назначение/удаление worker
+  // Действия: бан / разбан / worker
   const action = async (fn, userId, msgSuccess) => {
     try {
       await fn(userId)
-      // Локально обновляем статус пользователя для мгновенного UI
+
       setUsers(prev =>
         prev.map(u => {
           if (u.id === userId) {
@@ -76,12 +78,14 @@ export default function AdminPanel() {
           return u
         })
       )
+
       toast.success(msgSuccess)
     } catch (err) {
       toast.error(`Ошибка: ${err.message}`)
     }
   }
 
+  // Создание навыка
   const submitSkill = async (e) => {
     e.preventDefault()
     try {
@@ -107,7 +111,13 @@ export default function AdminPanel() {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Поиск по email / имени"
             />
-            <select value={role} onChange={(e) => setRole(e.target.value)}>
+            <select
+              value={role}
+              onChange={(e) => {
+                setRole(e.target.value)
+                setPage(1)
+              }}
+            >
               <option value="">Все роли</option>
               <option value="user">User</option>
               <option value="contractor">Contractor</option>
@@ -151,15 +161,36 @@ export default function AdminPanel() {
                     <td>{u.is_banned ? 'Забанен' : 'Активен'}</td>
                     <td className="user-actions">
                       {!u.is_banned ? (
-                        <button className="ban" onClick={() => action(banUser, u.id, 'Пользователь забанен')}>Бан</button>
+                        <button
+                          className="ban"
+                          onClick={() => action(banUser, u.id, 'Пользователь забанен')}
+                        >
+                          Бан
+                        </button>
                       ) : (
-                        <button className="unban" onClick={() => action(unbanUser, u.id, 'Пользователь разбанен')}>Разбан</button>
+                        <button
+                          className="unban"
+                          onClick={() => action(unbanUser, u.id, 'Пользователь разбанен')}
+                        >
+                          Разбан
+                        </button>
                       )}
+
                       {u.role === 'user' && (
-                        <button className="assign" onClick={() => action(assignWorker, u.id, 'Назначен рабочим')}>Сделать worker</button>
+                        <button
+                          className="assign"
+                          onClick={() => action(assignWorker, u.id, 'Назначен рабочим')}
+                        >
+                          Сделать worker
+                        </button>
                       )}
                       {u.role === 'contractor' && (
-                        <button className="delete" onClick={() => action(deleteWorker, u.id, 'Рабочий удалён')}>Удалить worker</button>
+                        <button
+                          className="delete"
+                          onClick={() => action(deleteWorker, u.id, 'Рабочий удалён')}
+                        >
+                          Удалить worker
+                        </button>
                       )}
                     </td>
                   </tr>
@@ -170,7 +201,9 @@ export default function AdminPanel() {
 
           {/* Пагинация */}
           <div className="pagination">
-            <button disabled={page === 1} onClick={() => setPage(page - 1)}>Назад</button>
+            <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+              Назад
+            </button>
             <button onClick={() => setPage(page + 1)}>Далее</button>
           </div>
         </div>
