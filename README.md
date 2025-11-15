@@ -5,7 +5,7 @@
 Предполагаемые сервисы (по docker-compose):
 - Auth Service: http://localhost:8000
 - Profile Service: http://localhost:7000
-- Request Service: http://localhost:6000
+- Request Service: http://localhost:3000
 - Notification Service (WebSocket): ws://localhost:5000/ws
 
 Как запустить:
