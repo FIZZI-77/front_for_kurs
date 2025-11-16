@@ -6,9 +6,9 @@ import { requestAPI } from './base'
 // =============================
 
 // Доступные заявки
-export const getAvailableRequests = () => {
-  return requestAPI.get('/worker/requests/available')
-}
+export const getAvailableRequests = (page = 1, pageSize = 5) =>
+  requestAPI.get(`/worker/requests/available?page=${page}&pageSize=${pageSize}`)
+
 
 // Принять заявку
 export const acceptRequest = (requestId) => {
