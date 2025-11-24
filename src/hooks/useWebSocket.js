@@ -1,24 +1,51 @@
-import { useEffect, useRef } from 'react'
-import { WS_URL } from '../api/notifications'
+// useWebSocket.js
+import { useEffect, useRef } from "react";
+import jwt_decode from "jwt-decode";
+
+// Хардкодим URL WebSocket прямо здесь
+const WS_URL = "ws://localhost:5000/ws"; // обязательно ws://, а не http://
 
 export default function useWebSocket(onMessage) {
-  const wsRef = useRef(null)
+  const wsRef = useRef(null);
 
   useEffect(() => {
-    const ws = new WebSocket(WS_URL)
-    wsRef.current = ws
-    ws.onopen = () => console.log('ws open')
-    ws.onmessage = (e) => {
-      try {
-        const data = JSON.parse(e.data)
-        onMessage && onMessage(data)
-      } catch (err) {
-        console.error('ws parse err', err)
-      }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("❌ Нет токена, WebSocket не будет подключён");
+      return;
     }
-    ws.onclose = () => console.log('ws close')
-    return () => ws.close()
-  }, [onMessage])
 
-  return wsRef
+    let decoded;
+    try {
+      decoded = jwt_decode(token);
+      console.log("JWT decoded:", decoded);
+    } catch (err) {
+      console.error("❌ Не удалось декодировать JWT:", err);
+      return;
+    }
+
+    const userId = decoded.user_id || decoded.id || decoded.sub || decoded.userId;
+    if (!userId) {
+      console.error("❌ В токене нет userId");
+      return;
+    }
+
+    const url = `${WS_URL}?user_id=${userId}`;
+    const ws = new WebSocket(url);
+    wsRef.current = ws;
+
+    ws.onopen = () => console.log("WS подключён");
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        onMessage(data);
+      } catch {
+        onMessage(event.data);
+      }
+    };
+    ws.onclose = () => console.log("WS закрыт");
+    ws.onerror = (e) => console.log("WS ошибка:", e);
+
+    return () => ws.close();
+  }, [onMessage]);
 }
